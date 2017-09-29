@@ -1,7 +1,5 @@
 import sbt._
-import sbt.{Developer, ScmInfo, url}
 import sbt.Keys._
-import SPSettings._
 
 object PublishingSettings {
   lazy val description = "Sequence Planner (SP) is a micro service architecture for modeling and analyzing automation systems"

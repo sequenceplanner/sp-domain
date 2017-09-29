@@ -45,6 +45,30 @@ object SPSettings {
         name = "Ashfaq Farooqui",
         email = "ashfaqf@chalmers.se",
         url   = url("https://github.com/ashfaqfarooqui")
+      ),
+      Developer(
+        id = "edvardlindelof",
+        name = "Edvard Lindelöf",
+        email = "edvardlindelof@gmail.com",
+        url   = url("https://github.com/edvardlindelof")
+      ),
+      Developer(
+        id = "marptt",
+        name = "Martin Petterson",
+        email = "laxenmeflaxen@gmail.com",
+        url   = url("https://github.com/marptt")
+      ),
+      Developer(
+        id = "ellenkorsberg",
+        name = "Ellen Korsberg",
+        email = "korsberg.ellen@gmail.com",
+        url   = url("https://github.com/ellenkorsberg")
+      ),
+      Developer(
+        id    = "aleastChs",
+        name  = "Alexander Åstrand",
+        email = "aleast@student.chalmers.se",
+        url   = url("https://github.com/aleastChs")
       )
     )
   )
@@ -67,8 +91,16 @@ object SPSettings {
   /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
   object versions {
     val scala = "2.12.3"
+    val scalaDom = "0.9.2"
+    val scalajsReact = "1.1.0"
+    val scalaCSS = "0.5.3"
     val log4js = "1.4.10"
+    val diode = "1.1.2"
+    val uTest = "0.4.7"
+    val scalarx = "0.3.2"
+    val scalaD3 = "0.3.4"
     val scalaTest = "3.0.1"
+    val akka = "2.5.3"
   }
 
   /**
@@ -82,6 +114,43 @@ object SPSettings {
     "org.julienrf" %%% "play-json-derived-codecs" % "4.0.0",
     "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-M12"
   ))
-  // "org.joda" % "joda-convert" % "1.8.2" maybe add this to jvm-side
+  // "org.joda" % "joda-convert" % "1.8.2" add this to jvm-side
 
+
+
+  /** Dependencies use for comm */
+  lazy val commDependencies = Def.setting(Seq(
+    "com.typesafe.akka" %% "akka-actor" % versions.akka,
+    "com.typesafe.akka" %% "akka-cluster" % versions.akka,
+    "com.typesafe.akka" %% "akka-cluster-tools" % versions.akka,
+    "com.typesafe.akka" %% "akka-testkit" % versions.akka,
+    "org.slf4j" % "slf4j-simple" % "1.7.7",
+    "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.1",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    "com.sksamuel.avro4s" %% "avro4s-core" % "1.8.0"
+  ))
+
+  /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
+  val guiDependencies = Def.setting(Seq(
+    "com.github.japgolly.scalajs-react" %%% "core" % versions.scalajsReact,
+    "com.github.japgolly.scalajs-react" %%% "extra" % versions.scalajsReact,
+    "com.github.japgolly.scalacss" %%% "core" % versions.scalaCSS,
+    "com.github.japgolly.scalacss" %%% "ext-react" % versions.scalaCSS,
+    "io.suzaku" %%% "diode" % versions.diode,
+    "io.suzaku" %%% "diode-react" % versions.diode,
+    "org.scala-js" %%% "scalajs-dom" % versions.scalaDom,
+    "com.lihaoyi" %%% "scalarx" % versions.scalarx,
+    "org.singlespaced" %%% "scalajs-d3" % versions.scalaD3,
+    "org.scalatest" %%% "scalatest" % versions.scalaTest % "test",
+    "com.lihaoyi" %%% "utest" % versions.uTest % Test,
+    "com.github.julien-truffaut" %%%  "monocle-core"  % "1.4.0",
+    "com.github.julien-truffaut" %%%  "monocle-macro" % "1.4.0"
+  ))
+
+
+
+  lazy val jsSettings = Seq(
+    testFrameworks += new TestFramework("utest.runner.Framework"),
+    addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
+  )
 }
