@@ -1,11 +1,12 @@
 import SPSettings._
 
 lazy val projectName = "sp-domain"
+lazy val projectVersion = "0.9.4"
 
 lazy val buildSettings = Seq(
   name         := projectName,
   description  := "The domain and logic to work with it",
-  version      := "0.9.1-SNAPSHOT",
+  version      := projectVersion,
   libraryDependencies ++= domainDependencies.value,
   scmInfo := Some(ScmInfo(
     PublishingSettings.githubSP(projectName),
