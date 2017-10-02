@@ -5,13 +5,18 @@ import sp.domain._
 object StructLogic extends StructLogics
 
 trait StructLogics {
-
-  implicit def *(id: ID): StructNode = StructNode(id)
-  implicit def *(item: IDAble): StructNode = StructNode(item.id)
+  // TODO: need some more test before released
 
   implicit class StructExtras(x: Struct) {
     def getChildren(node: StructNode): List[StructNode] = {
       x.items.filter(_.parent.contains(node.nodeID))
+    }
+
+    def getChildrenMap: Map[ID, List[StructNode]] = {
+      x.items.foldLeft(Map[ID, List[StructNode]]()){(a, b) =>
+        val parentChildren = b.parent.map(p => b :: a.getOrElse(p, List()))
+        parentChildren.map(ch => a + (b.parent.get -> ch)).getOrElse(a)
+      }
     }
 
     def getAllChildren(node: StructNode): List[StructNode] = {
@@ -33,9 +38,36 @@ trait StructLogics {
       }
     }
 
+    def getRootNodes = x.items.filter(_.parent.isEmpty)
+
+    def printNiceTree(xs: List[IDAble] = List()): Unit = {
+      val chM = x.getChildrenMap
+      val roots = x.getRootNodes
+      val idM = xs.map(i => i.id -> i).toMap
+      def getName(id: ID) = idM.get(id).map(_.name).getOrElse(id.toString)
+      def diggerPrint(x: StructNode, pre: String): Unit = {
+        println(pre + s"item:${getName(x.item)}, nodeID:${x.nodeID}")
+        chM.getOrElse(x.nodeID, List()).foreach(ch => diggerPrint(ch, pre+"--"))
+      }
+      roots.foreach(diggerPrint(_, ""))
+
+    }
+
+
+
 
     def removeDuplicates(): Struct = {
       x.copy(items = x.items.distinct)
+    }
+
+    def removeItem(itemID: ID) = {
+      val filtered = x.items.filter(_.item == itemID)
+      x.copy(items = filtered)
+    }
+
+    def removeNode(nodeID: ID) = {
+      val filtered = x.items.filter(_.nodeID == nodeID)
+      x.copy(items = filtered)
     }
 
     def hasLoops = {
@@ -51,35 +83,42 @@ trait StructLogics {
       x.items.forall(s => req(s, Set()))
     }
 
-    def <(node: StructNode) = {
+    def +(node: StructNode) = {
       x.copy(items = x.items :+ node)
     }
 
-    def <(xs: List[StructNode]) = {
+    def ++(xs: List[StructNode]) = {
       x.copy(items = x.items ++ xs)
     }
 
-
-
   }
 
-  implicit class StructNodeForIdableExtras(x: IDAble) {
-    val n = *(x)
+  // Mutable class to simplify the DSL
+  implicit class StructWrapper(x: IDAble) {
+    val id = x.id
+    var ch: List[StructWrapper] = List()
+    def children(xs: StructWrapper*) = {
+      ch = xs.toList
+      this
+    }
   }
 
-  implicit class StructNodeExtras(n: StructNode) {
-
+  def makeStructNodes(xs: StructWrapper*) = {
+    def digger(xs: List[StructWrapper], parent: Option[ID]): List[StructNode] = {
+      xs match {
+        case Nil => List()
+        case x :: xs =>
+          val n = StructNode(x.id, parent)
+          val ch = digger(x.ch, Some(n.nodeID))
+          val rest = digger(xs, parent)
+          n +: ch ++: rest
+      }
+    }
+    digger(xs.toList, None)
   }
 
-  // Use this mutual class to simplify the creation of a structure
-//  class StructConstr(val node: StructNode, var p: Option[StructConstr], var ch: List[StructConstr]) {
-//    def make: List[StructNode] = {
-//      val xs = ch.flatMap(_.make)
-//      val par = p.map(_.node.nodeID)
-//      node.copy(parent = par)
-//    }
-//  }
 
 }
+
 
 
