@@ -44,7 +44,7 @@ case class SPState(name: String = "state",
                    id: ID = ID.newID) extends IDAble
 
 case class Struct(name: String,
-                  items: List[StructNode] = List(),
+                  items: Set[StructNode] = Set(),
                   attributes: SPAttributes = SPAttributes(),
                   id: ID = ID.newID) extends IDAble {
   lazy val nodeMap = items.map(l => l.nodeID -> l).toMap

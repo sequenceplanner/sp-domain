@@ -92,7 +92,7 @@ class SpAttributesTest extends FreeSpec with TestClasses{
       val s = SPState("s1", Map(ID.newID ->SPValue("hej")))
       val t = Thing("t1")
       val sop = SOPSpec("sop1", List(Parallel(List(EmptySOP))))
-      val struct = Struct("str", List(StructNode(ID.newID)))
+      val struct = Struct("str", Set(StructNode(ID.newID)))
 
       val oV = SPValue(o)
       val oS = SPValue(s)

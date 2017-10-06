@@ -33,7 +33,7 @@ lazy val spdomain = (crossProject.crossType(CrossType.Pure) in file("."))
   .jvmSettings(
     libraryDependencies += "org.joda" % "joda-convert" % "1.8.2"
   )
-  .jsSettings()
+  .jsSettings(jsSettings)
 
 lazy val spdomain_jvm = spdomain.jvm
 lazy val spdomain_js = spdomain.js

@@ -9,7 +9,7 @@ trait StructLogics {
 
   implicit class StructExtras(x: Struct) {
     def getChildren(node: StructNode): List[StructNode] = {
-      x.items.filter(_.parent.contains(node.nodeID))
+      x.items.filter(_.parent.contains(node.nodeID)).toList
     }
 
     def getChildrenMap: Map[ID, List[StructNode]] = {
@@ -53,13 +53,6 @@ trait StructLogics {
 
     }
 
-
-
-
-    def removeDuplicates(): Struct = {
-      x.copy(items = x.items.distinct)
-    }
-
     def removeItem(itemID: ID) = {
       val filtered = x.items.filter(_.item == itemID)
       x.copy(items = filtered)
@@ -84,7 +77,7 @@ trait StructLogics {
     }
 
     def +(node: StructNode) = {
-      x.copy(items = x.items :+ node)
+      x.copy(items = x.items + node)
     }
 
     def ++(xs: List[StructNode]) = {
@@ -104,14 +97,14 @@ trait StructLogics {
   }
 
   def makeStructNodes(xs: StructWrapper*) = {
-    def digger(xs: List[StructWrapper], parent: Option[ID]): List[StructNode] = {
+    def digger(xs: List[StructWrapper], parent: Option[ID]): Set[StructNode] = {
       xs match {
-        case Nil => List()
+        case Nil => Set()
         case x :: xs =>
           val n = StructNode(x.id, parent)
           val ch = digger(x.ch, Some(n.nodeID))
           val rest = digger(xs, parent)
-          n +: ch ++: rest
+          ch ++ rest + n
       }
     }
     digger(xs.toList, None)

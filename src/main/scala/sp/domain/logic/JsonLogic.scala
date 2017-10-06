@@ -587,7 +587,7 @@ trait JsonImplicit extends JsonDerived {
     def reads(json: JsValue): JsResult[Struct] = {
       val idable = extrIDable("Struct", json)
       val items = (JsPath \ "items").read[List[StructNode]].reads(json).getOrElse(List())
-      idable.map{case (n, id, attr) => Struct(n, items, attr, id)}
+      idable.map{case (n, id, attr) => Struct(n, items.toSet, attr, id)}
     }
   }
   implicit lazy val writeStruct: Writes[Struct] = new Writes[Struct] {
@@ -648,115 +648,6 @@ trait JsonImplicit extends JsonDerived {
       JsObject(toFixedMap)
     }
   }
-
-
-
-
-//  implicit lazy val stUpdf1 = Json.format[ASSIGN]
-//  implicit lazy val stUpdf2 = Json.format[DECR]
-//  implicit lazy val stUpdf3 = Json.format[INCR]
-//  implicit lazy val stUpdf4 = Json.format[ValueHolder]
-//  implicit lazy val stUpdf5 = Json.format[SVIDEval]
-//  implicit lazy val stUpdfR = __.read[ValueHolder].map(x => x:StateUpdater)
-//  implicit lazy val stUpdfW = Writes[StateUpdater]{
-//    case x: ASSIGN => Json.toJson(x)
-//  }
-//  implicit lazy val stEvR = __.read[SVIDEval].map(x => x:StateEvaluator)
-//  implicit lazy val stEvW = Writes[StateEvaluator]{
-//    case x: SVIDEval => Json.toJson(x)
-//  }
-//
-//
-//  implicit lazy val propEvF1 = Json.format[EQ]
-//  implicit lazy val propEvF2 = Json.format[NEQ]
-//  implicit lazy val propEvF3 = Json.format[GREQ]
-//  implicit lazy val propEvF4 = Json.format[LEEQ]
-//  implicit lazy val propEvF5 = Json.format[GR]
-//  implicit lazy val propEvF6 = Json.format[LE]
-//  implicit lazy val propEvR = __.read[EQ].map(x => x:PropositionEvaluator)
-//  implicit lazy val propEvW = Writes[PropositionEvaluator]{
-//    case x: EQ => Json.toJson(x)
-//  }
-//
-//  implicit lazy val propR = __.read[PropositionEvaluator].map(x => x:Proposition)
-//  implicit lazy val propW = Writes[Proposition]{
-//    case x: PropositionEvaluator => Json.toJson(x)
-//  }
-//
-//
-//  implicit lazy val actionFormat = Json.format[Action]
-//  implicit lazy val conditionFormat = Json.format[Condition]
-
-
-
-
-//  implicit lazy val stateEvWrites: JSWrites[StateEvaluator] = deriveWriteISA[StateEvaluator]
-//  implicit lazy val stateEvReads: JSReads[StateEvaluator] = deriveReadISA[StateEvaluator]
-//  implicit lazy val stateUpdRead: JSReads[StateUpdater] = deriveReadISA[StateUpdater]
-//  implicit lazy val stateUpdWrites: JSWrites[StateUpdater] = deriveWriteISA[StateUpdater]
-//  implicit lazy val propsRead: JSReads[Proposition] = deriveReadISA[Proposition]
-//  implicit lazy val propsWrites: JSWrites[Proposition] = deriveWriteISA[Proposition]
-//  implicit lazy val actionsRead: JSReads[Action] = Json.reads[Action]
-//  implicit lazy val actionsWrites: JSWrites[Action] = Json.writes[Action]
-//  implicit lazy val condsRead: JSReads[Condition] = Json.reads[Condition]
-//  implicit lazy val condsWrites: JSWrites[Condition] = Json.writes[Condition]
-//  implicit lazy val sopsRead: JSReads[SOP] = deriveReadISA[SOP]
-//  implicit lazy val sopsWrites: JSWrites[SOP] = deriveWriteISA[SOP]
-//  implicit lazy val structRead: JSReads[StructNode] = Json.reads[StructNode]
-//  implicit lazy val structrites: JSWrites[StructNode] = Json.writes[StructNode]
-////
-//
-//  implicit lazy val stateReads: JSReads[Map[ID, SPValue]] = new JSReads[Map[ID, SPValue]] {
-//    override def reads(json: JsValue): JsResult[Map[ID, SPValue]] = {
-//      json.validate[Map[String, SPValue]].map(xs => xs.collect{case (k, v) if ID.isID(k) => ID.makeID(k).get -> v})
-//    }
-//  }
-//  implicit lazy val stateWrites: JSWrites[Map[ID, SPValue]] = new OWrites[Map[ID, SPValue]] {
-//    override def writes(xs: Map[ID, SPValue]): JsObject = {
-//      val toFixedMap = xs.map{case (k, v) => k.toString -> v}
-//      JsObject(toFixedMap)
-//    }
-//  }
-
-//  implicit lazy val opsWrites: JSReads[Operation] = Json.reads[Operation]
-//  implicit lazy val opsReads: JSWrites[Operation] = Json.writes[Operation]
-//  implicit lazy val thingsWrites: JSReads[Thing] = Json.reads[Thing]
-//  implicit lazy val thingsReads: JSWrites[Thing] = Json.writes[Thing]
-//  implicit lazy val sopSpecWrites: JSReads[SOPSpec] = Json.reads[SOPSpec]
-//  implicit lazy val sopSpecReads: JSWrites[SOPSpec] = Json.writes[SOPSpec]
-//  implicit lazy val spSpecWrites: JSReads[SPSpec] = Json.reads[SPSpec]
-//  implicit lazy val spSpecReads: JSWrites[SPSpec] = Json.writes[SPSpec]
-//  implicit lazy val spResWrites: JSReads[SPResult] = Json.reads[SPResult]
-//  implicit lazy val spResReads: JSWrites[SPResult] = Json.writes[SPResult]
-//  implicit lazy val spStateWrites: JSReads[SPState] = Json.reads[SPState]
-//  implicit lazy val spStateReads: JSWrites[SPState] = Json.writes[SPState]
-//  implicit lazy val structWrites: JSReads[Struct] = Json.reads[Struct]
-//  implicit lazy val structReads: JSWrites[Struct] = Json.writes[Struct]
-//  implicit lazy val idableWrites: JSFormat[IDAble] = deriveFormatISA[IDAble]
-  //implicit lazy val idableReads: JSWrites[IDAble] = Json.writes[IDAble]
-
-  //implicit def toJsAttribWrapper[T](field: T)(implicit w: JSWrites[T]): AttributeWrapper = Json.toJsFieldJsValueWrapper(field)(w)
-
-
-
-//  implicit val idAbleR = __.read[Operation].map(x => x:IDAble) orElse
-//    __.read[Thing].map(x => x:IDAble) orElse
-//    __.read[SOPSpec].map(x => x:IDAble) orElse
-//    __.read[SPSpec].map(x => x:IDAble) orElse
-//    __.read[SPResult].map(x => x:IDAble) orElse
-//    __.read[SPState].map(x => x:IDAble) orElse
-//    __.read[Struct].map(x => x:IDAble)
-//
-//  implicit val idAbleW = Writes[IDAble]{
-//    case x: Operation => Json.toJson(x)
-//    case x: SOPSpec => Json.toJson(x)
-//    case x: SPSpec => Json.toJson(x)
-//    case x: SPResult => Json.toJson(x)
-//    case x: SPState => Json.toJson(x)
-//    case x: Struct => Json.toJson(x)
-//    case x: Thing => Json.toJson(x)
-//  }
-
 
 
 
