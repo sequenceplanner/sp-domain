@@ -1,6 +1,6 @@
 package sp.domain
 
-import org.threeten.bp.ZonedDateTime
+import java.time.ZonedDateTime
 import play.api.libs.json._
 import sp.domain.Logic._
 

@@ -1,6 +1,6 @@
 package sp.domain.logic
 
-import org.threeten.bp._
+import java.time._
 import sp.domain._
 import play.api.libs.json._
 import play.api.libs.json.Reads.verifying
