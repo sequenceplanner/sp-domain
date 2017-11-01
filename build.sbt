@@ -1,7 +1,7 @@
 import SPSettings._
 
 lazy val projectName = "sp-domain"
-lazy val projectVersion = "0.9.4.1"
+lazy val projectVersion = "0.9.5-SNAPSHOT"
 
 lazy val buildSettings = Seq(
   name         := projectName,
