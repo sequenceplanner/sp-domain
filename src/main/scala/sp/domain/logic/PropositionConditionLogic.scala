@@ -205,7 +205,7 @@ case class PropositionParser(idablesToParseFromString: List[IDAble] = List()) ex
   lazy val expressionFALSE: Parser[Proposition] = REG_EX_FALSE ^^ { _ => AlwaysFalse }
 
   lazy val leftEv: Parser[StateEvaluator] = uuid(str => SVIDEval(ID.makeID(str).get)) | stringValue
-  lazy val rightEv: Parser[StateEvaluator] = uuid(str => SVIDEval(ID.makeID(str).get)) | intValue | trueValue | falseValue | stringValue
+  lazy val rightEv: Parser[StateEvaluator] = uuid(str => SVIDEval(ID.makeID(str).get)) | number | trueValue | falseValue | stringValue
 
   lazy val stringValue = REG_EX_STRINGVALUE ^^ {
     v => spidMap.get(v) match {
@@ -224,7 +224,7 @@ case class ActionParser(idablesToParseFromString: List[IDAble] = List()) extends
   }
 
   final lazy val REG_EX_OPERATORASSIGN = s"=|:=".r
-  final lazy val REG_EX_OPERATORINCR = s"+=".r
+  final lazy val REG_EX_OPERATORINCR = s"\\+=".r
   final lazy val REG_EX_OPERATORDECR = s"-=".r
 
   lazy val factor: Parser[Action] = expressionASSIGNtype1 | expressionASSIGNtype2 | expressionINCR | expressionDECR | "(" ~> factor <~ ")" ^^ { case exp => exp }
@@ -234,7 +234,7 @@ case class ActionParser(idablesToParseFromString: List[IDAble] = List()) extends
   lazy val expressionDECR: Parser[Action] = leftEv ~ REG_EX_OPERATORDECR ~ REG_EX_INTVALUE ^^ { case ~(~(var1, _), v) => Action(var1, DECR(Integer.parseInt(v))) }
 
   lazy val leftEv: Parser[ID] = uuid(str => ID.makeID(str).get) | stringValue_ID
-  lazy val rightEv: Parser[StateUpdater] = intValue | trueValue | falseValue | stringValue
+  lazy val rightEv: Parser[StateUpdater] = number | trueValue | falseValue | stringValue
 
   lazy val stringValue_ID = s"${spidMap.keySet.toSeq.sortBy(_.length).reverse.mkString("|")}".r ^^ { case str => spidMap(str) }
   lazy val stringValue = REG_EX_STRINGVALUE ^^ {
@@ -250,14 +250,15 @@ trait BaseParser extends JavaTokenParsers {
   final lazy val REG_EX_UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".r
   final lazy val REG_EX_STRINGVALUE = s"(\\p{L}|\\w|\\.)+".r
   //http://www.autohotkey.com/docs/misc/RegEx-QuickRef.htm
-  final lazy val REG_EX_INTVALUE = s"\\d+".r
+  final lazy val REG_EX_DOUBLEVALUE = s"[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?".r
+  final lazy val REG_EX_INTVALUE = s"-?\\d+".r
   final lazy val REG_EX_TRUE = s"true|TRUE|T|1".r
   final lazy val REG_EX_FALSE = s"false|FALSE|F|0".r
 
   def uuid[T](parserFunction: String => T) = REG_EX_UUID ^^ {
     parserFunction
   }
-  lazy val intValue = REG_EX_INTVALUE ^^ { v => ValueHolder(Integer.parseInt(v)) }
+  lazy val number = REG_EX_DOUBLEVALUE ^^ { v => ValueHolder(SPValue(v.toDouble)) }
   final lazy val trueValue = REG_EX_TRUE ^^ { v => ValueHolder(true) }
   final lazy val falseValue = REG_EX_FALSE ^^ { v => ValueHolder(false) }
 
