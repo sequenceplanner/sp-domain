@@ -249,7 +249,7 @@ case class ActionParser(idablesToParseFromString: List[IDAble] = List()) extends
 trait BaseParser extends JavaTokenParsers {
   final lazy val REG_EX_UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".r
   final lazy val REG_EX_STRINGVALUE = s"(\\p{L}|\\w|\\.)+".r
-  final lazy val REG_EX_ENCLOSEDSTRINGVALUE = "\"(\\.|[^\"])*\"".r
+  final lazy val REG_EX_ENCLOSEDSTRINGVALUE = "'(\\.|[^'])*'".r
   //http://www.autohotkey.com/docs/misc/RegEx-QuickRef.htm
   final lazy val REG_EX_DOUBLEVALUE = s"[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?".r
   final lazy val REG_EX_INTVALUE = s"-?\\d+".r
@@ -263,7 +263,7 @@ trait BaseParser extends JavaTokenParsers {
   final lazy val trueValue = REG_EX_TRUE ^^ { v => ValueHolder(true) }
   final lazy val falseValue = REG_EX_FALSE ^^ { v => ValueHolder(false) }
   final lazy val enclosedStringValue = REG_EX_ENCLOSEDSTRINGVALUE ^^ { v =>
-    ValueHolder(SPValue(v.stripPrefix("\"").stripSuffix("\"")))}
+    ValueHolder(SPValue(v.stripPrefix("'").stripSuffix("'")))}
 
   val idablesToParseFromString: List[IDAble]
   lazy val spidMap = idablesToParseFromString.map(item => item.name -> item.id).toMap
