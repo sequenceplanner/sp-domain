@@ -130,21 +130,24 @@ trait StructLogics {
     }
   }
 
-  def makeStructNodes(xs: StructWrapper*) = {
-    def digger(xs: List[StructWrapper], parent: Option[ID]): Set[StructNode] = {
-      xs match {
-        case Nil => Set()
-        case x :: xs =>
-          val n = StructNode(x.id, parent)
-          val ch = digger(x.ch, Some(n.nodeID))
-          val rest = digger(xs, parent)
-          ch ++ rest + n
-      }
+  private def digger(xs: List[StructWrapper], parent: Option[ID]): Set[StructNode] = {
+    xs match {
+      case Nil => Set()
+      case x :: xs =>
+        val n = StructNode(x.id, parent)
+        val ch = digger(x.ch, Some(n.nodeID))
+        val rest = digger(xs, parent)
+        ch ++ rest + n
     }
+  }
+
+  def makeStructNodes(xs: StructWrapper*) = {
     digger(xs.toList, None)
   }
 
+  def makeStructNodes(xs: List[IDAble]): Set[StructNode] = {
+    digger(xs.map(StructWrapper), None)
+  }
+
+
 }
-
-
-
