@@ -205,7 +205,7 @@ case class PropositionParser(idablesToParseFromString: List[IDAble] = List()) ex
   lazy val expressionFALSE: Parser[Proposition] = REG_EX_FALSE ^^ { _ => AlwaysFalse }
 
   lazy val leftEv: Parser[StateEvaluator] = uuid(str => SVIDEval(ID.makeID(str).get)) | stringValue
-  lazy val rightEv: Parser[StateEvaluator] = uuid(str => SVIDEval(ID.makeID(str).get)) | number | trueValue | falseValue | stringValue
+  lazy val rightEv: Parser[StateEvaluator] = uuid(str => SVIDEval(ID.makeID(str).get)) | number | trueValue | falseValue | enclosedStringValue | stringValue
 
   lazy val stringValue = REG_EX_STRINGVALUE ^^ {
     v => spidMap.get(v) match {
@@ -234,7 +234,7 @@ case class ActionParser(idablesToParseFromString: List[IDAble] = List()) extends
   lazy val expressionDECR: Parser[Action] = leftEv ~ REG_EX_OPERATORDECR ~ REG_EX_INTVALUE ^^ { case ~(~(var1, _), v) => Action(var1, DECR(Integer.parseInt(v))) }
 
   lazy val leftEv: Parser[ID] = uuid(str => ID.makeID(str).get) | stringValue_ID
-  lazy val rightEv: Parser[StateUpdater] = number | trueValue | falseValue | stringValue
+  lazy val rightEv: Parser[StateUpdater] = number | trueValue | falseValue | enclosedStringValue | stringValue
 
   lazy val stringValue_ID = s"${spidMap.keySet.toSeq.sortBy(_.length).reverse.mkString("|")}".r ^^ { case str => spidMap(str) }
   lazy val stringValue = REG_EX_STRINGVALUE ^^ {
@@ -249,6 +249,7 @@ case class ActionParser(idablesToParseFromString: List[IDAble] = List()) extends
 trait BaseParser extends JavaTokenParsers {
   final lazy val REG_EX_UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".r
   final lazy val REG_EX_STRINGVALUE = s"(\\p{L}|\\w|\\.)+".r
+  final lazy val REG_EX_ENCLOSEDSTRINGVALUE = "\"(\\.|[^\"])*\"".r
   //http://www.autohotkey.com/docs/misc/RegEx-QuickRef.htm
   final lazy val REG_EX_DOUBLEVALUE = s"[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?".r
   final lazy val REG_EX_INTVALUE = s"-?\\d+".r
@@ -258,28 +259,34 @@ trait BaseParser extends JavaTokenParsers {
   def uuid[T](parserFunction: String => T) = REG_EX_UUID ^^ {
     parserFunction
   }
-  lazy val number = REG_EX_DOUBLEVALUE ^^ { v => ValueHolder(SPValue(v.toDouble)) }
+  final lazy val number = REG_EX_DOUBLEVALUE ^^ { v => ValueHolder(SPValue(v.toDouble)) }
   final lazy val trueValue = REG_EX_TRUE ^^ { v => ValueHolder(true) }
   final lazy val falseValue = REG_EX_FALSE ^^ { v => ValueHolder(false) }
+  final lazy val enclosedStringValue = REG_EX_ENCLOSEDSTRINGVALUE ^^ { v =>
+    ValueHolder(SPValue(v.stripPrefix("\"").stripSuffix("\"")))}
 
   val idablesToParseFromString: List[IDAble]
   lazy val spidMap = idablesToParseFromString.map(item => item.name -> item.id).toMap
 }
 
-//object TestParser extends App {
+// object TestParser extends App {
 //  println("Welcome to the parser: Type an expression or enter for exit")
 //  waitForString
-//
+
 //  private def waitForString {
 //    def waitEOF(): Unit = Console.readLine() match {
 //      case "" =>
 //      case "exit" =>
 //      case str: String => {
-//        println(PropositionParser().parseStr(str))
+//        val things = List(Thing("a"),Thing("b"), Thing("c"))
+//        println(PropositionParser(things).parseStr(str))
+//        println("*******************")
+//        println(ActionParser(things).parseStr(str))
+
 //        //          println(PropositionParser.parseAll(PropositionParser.stateEv, str))
 //        waitEOF()
 //      }
 //    }
 //    waitEOF()
 //  }
-//}
+// }
