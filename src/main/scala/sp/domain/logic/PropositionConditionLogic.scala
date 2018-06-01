@@ -180,7 +180,7 @@ case class PropositionParser(idablesToParseFromString: List[IDAble] = List()) ex
 
   final lazy val REG_EX_OR = s"or|OR|Or|\\|\\||\\|".r
   final lazy val REG_EX_AND = s"and|AND|And|&&|&".r
-  final lazy val REG_EX_NOT = s"not|n|!".r
+  final lazy val REG_EX_NOT = s"not|NOT|n|!".r
 
   final lazy val REG_EX_OPERATOREQ = s"==".r
   final lazy val REG_EX_OPERATOREQ2 = s"=".r

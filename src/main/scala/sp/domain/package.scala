@@ -31,7 +31,6 @@ package object domain {
     */
   type ID = java.util.UUID
 
-
   import play.api.libs.json._
 
 

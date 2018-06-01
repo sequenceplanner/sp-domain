@@ -33,8 +33,6 @@ trait OperationLogics {
       props.defs.nextState(o, s)
     }
 
-
-
     def inDomain = OperationState.inDomain
   }
 
@@ -45,6 +43,14 @@ trait OperationLogics {
     val finished: SPValue = "f"
     val domain = Set(init, executing, finished)
     def inDomain = domain.contains(_)
+  }
+
+  object OperationAttributes {
+    val kind = "kind"
+    val group = "group"
+    val precondition = "pre"
+    val postcondition = "post"
+    val resetcondition = "reset"
   }
 
   import OperationState._
@@ -58,17 +64,18 @@ trait OperationLogics {
     def completed(state: SPValue) = {
       state == finished
     }
+
     def kinds(state: SPValue): Set[SPValue] = {
-      if (state == init) Set("pre", "precondition")
-      else if (state == executing) Set("post", "postcondition")
-      else if (state == finished) Set("reset", "resetcondition")
+      if (state == init) Set("pre", "precondition", OperationAttributes.precondition)
+      else if (state == executing) Set("post", "postcondition", OperationAttributes.postcondition)
+      else if (state == finished) Set("reset", "resetcondition", OperationAttributes.resetcondition)
       else throw new IllegalArgumentException(s"Can not understand operation state: $state")
     }
     def filterConds(opState: SPValue, conds: List[Condition])(implicit props: EvaluateProp) = {
       val kinds = props.defs.kinds(opState)
       val groups = if (props.groups.isEmpty) props.groups else props.groups + ""
-      val groupCond = filter("group", conds, groups)
-      filter("kind", groupCond, kinds)
+      val groupCond = filter(OperationAttributes.group, conds, groups)
+      filter(OperationAttributes.kind, groupCond, kinds)
     }
 
     def filter(filter: String, conds: List[Condition], set: Set[SPValue]) = {

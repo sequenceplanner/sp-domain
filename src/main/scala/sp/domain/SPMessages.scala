@@ -67,7 +67,7 @@ case class SPHeader(from: String = "", // the name of the sender
                     attributes: SPAttributes = SPAttributes(), // to be used in some scenarios, where more info in the header is needed
                     timestamp: SPValue = SPMessage.timeStamp
                    ) {
-  def swapToAndFrom = this.copy(from = this.to, to = this.from, timestamp = SPMessage.timeStamp)
+  def swapToAndFrom(from: String = "") = this.copy(from = {if (from.isEmpty) this.to else from}, to = this.from, timestamp = SPMessage.timeStamp)
 }
 
 case class SPMessage(header: SPAttributes, body: SPAttributes) {
