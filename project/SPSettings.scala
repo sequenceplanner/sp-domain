@@ -85,7 +85,6 @@ object SPSettings {
   )
 
   lazy val projectResolvers: Seq[Resolver] = Seq(
-    Resolver.file("local", file(Path.userHome.absolutePath + "/.ivy2/local"))(Resolver.ivyStylePatterns),
     "Sonatype OSS Snapshots" at "https://oss.sonatype.org/Releases",
     "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/",
     "sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/")
@@ -93,16 +92,7 @@ object SPSettings {
   /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
   object versions {
     val scala = "2.12.3"
-    val scalaDom = "0.9.3"
-    val scalajsReact = "1.1.1"
-    val scalaCSS = "0.5.3"
-    val log4js = "1.4.10"
-    val diode = "1.1.2"
-    val uTest = "0.4.7"
-    val scalarx = "0.3.2"
-    val scalaD3 = "0.3.4"
     val scalaTest = "3.0.1"
-    val akka = "2.5.3"
   }
 
   /**
@@ -119,36 +109,6 @@ object SPSettings {
   // "org.joda" % "joda-convert" % "1.8.2" add this to jvm-side
 
 
-
-  /** Dependencies use for comm */
-  lazy val commDependencies = Def.setting(Seq(
-    "com.typesafe.akka" %% "akka-actor" % versions.akka,
-    "com.typesafe.akka" %% "akka-cluster" % versions.akka,
-    "com.typesafe.akka" %% "akka-cluster-tools" % versions.akka,
-    "com.typesafe.akka" %% "akka-testkit" % versions.akka,
-    "org.slf4j" % "slf4j-simple" % "1.7.7",
-    "com.github.romix.akka" %% "akka-kryo-serialization" % "0.5.1",
-    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-    "com.sksamuel.avro4s" %% "avro4s-core" % "1.8.0"
-  ))
-
-  /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
-  val guiDependencies = Def.setting(Seq(
-    "com.github.japgolly.scalajs-react" %%% "core" % versions.scalajsReact,
-    "com.github.japgolly.scalajs-react" %%% "extra" % versions.scalajsReact,
-    "com.github.japgolly.scalacss" %%% "core" % versions.scalaCSS,
-    "com.github.japgolly.scalacss" %%% "ext-react" % versions.scalaCSS,
-    "io.suzaku" %%% "diode" % versions.diode,
-    "io.suzaku" %%% "diode-react" % versions.diode,
-    "org.scala-js" %%% "scalajs-dom" % versions.scalaDom,
-    "com.lihaoyi" %%% "scalarx" % versions.scalarx,
-    "org.singlespaced" %%% "scalajs-d3" % versions.scalaD3,
-    "org.scalatest" %%% "scalatest" % versions.scalaTest % "test",
-    "com.lihaoyi" %%% "utest" % versions.uTest % Test,
-    "com.github.julien-truffaut" %%%  "monocle-core"  % "1.4.0",
-    "com.github.julien-truffaut" %%%  "monocle-macro" % "1.4.0",
-    "co.fs2" %%% "fs2-core" % "0.10.0-M7"
-  ))
 
 
 
