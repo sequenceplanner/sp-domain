@@ -173,7 +173,8 @@ import scala.util.parsing.combinator._
  */
 case class PropositionParser(idablesToParseFromString: List[IDAble] = List()) extends BaseParser {
 
-  def parseStr(str: String) = parseAll(or, str) match {
+  def parseStr(str: String) = if(str.isEmpty) Left("empty proposition string!")
+  else parseAll(or, str) match {
     case Success(result, _) => Right(result)
     case failure: NoSuccess => Left(failure) //failure.toString = "["+failure.next.pos+"] error: "+failure.msg+"\n\n"+failure.next.pos.longString
   }
@@ -193,7 +194,7 @@ case class PropositionParser(idablesToParseFromString: List[IDAble] = List()) ex
   lazy val or: Parser[Proposition] = and ~ rep(REG_EX_OR ~ and) ^^ { case f1 ~ temp => if (temp.isEmpty) f1 else OR(f1 +: temp.map { case ~(_, f2) => f2 }) }
   lazy val and: Parser[Proposition] = not ~ rep(REG_EX_AND ~ not) ^^ { case f1 ~ temp => if (temp.isEmpty) f1 else AND(f1 +: temp.map { case ~(_, f2) => f2 }) }
   lazy val not: Parser[Proposition] = opt(REG_EX_NOT) ~ factor ^^ { case Some(_) ~ f => NOT(f); case None ~ f => f }
-  lazy val factor: Parser[Proposition] = expressionEQ | expressionEQ2 | expressionNEQ | expressionGREQ | expressionLEEQ | expressionGR | expressionLE | expressionBOOL | expressionFALSE | "(" ~> or <~ ")" ^^ { case exp => exp }
+  lazy val factor: Parser[Proposition] =  expressionTRUE | expressionFALSE | expressionEQ | expressionEQ2 | expressionNEQ | expressionGREQ | expressionLEEQ | expressionGR | expressionLE | expressionBOOL | "(" ~> or <~ ")" ^^ { case exp => exp }
   lazy val expressionEQ: Parser[Proposition] = leftEv ~ REG_EX_OPERATOREQ ~ rightEv ^^ { case ~(~(var1, op), v) => EQ(var1, v) }
   lazy val expressionEQ2: Parser[Proposition] = leftEv ~ REG_EX_OPERATOREQ2 ~ rightEv ^^ { case ~(~(var1, op), v) => EQ(var1, v) }
   lazy val expressionNEQ: Parser[Proposition] = leftEv ~ REG_EX_OPERATORNEQ ~ rightEv ^^ { case ~(~(var1, op), v) => NEQ(var1, v) }
@@ -203,6 +204,8 @@ case class PropositionParser(idablesToParseFromString: List[IDAble] = List()) ex
   lazy val expressionLE: Parser[Proposition] = leftEv ~ REG_EX_OPERATORLE ~ rightEv ^^ { case ~(~(var1, op), v) => LE(var1, v) }
   lazy val expressionBOOL: Parser[Proposition] = leftEv ^^ { case var1 => EQ(var1, ValueHolder(true)) }
   lazy val expressionFALSE: Parser[Proposition] = REG_EX_FALSE ^^ { _ => AlwaysFalse }
+  lazy val expressionTRUE: Parser[Proposition] = REG_EX_TRUE ^^ { _ => AlwaysTrue }
+
 
   lazy val leftEv: Parser[StateEvaluator] = uuid(str => SVIDEval(ID.makeID(str).get)) | stringValue
   lazy val rightEv: Parser[StateEvaluator] = uuid(str => SVIDEval(ID.makeID(str).get)) | number | trueValue | falseValue | enclosedStringValue | stringValue
@@ -218,7 +221,8 @@ case class PropositionParser(idablesToParseFromString: List[IDAble] = List()) ex
 
 case class ActionParser(idablesToParseFromString: List[IDAble] = List()) extends BaseParser {
 
-  def parseStr(str: String) = parseAll(factor, str) match {
+  def parseStr(str: String) = if(str.isEmpty) Left("empty action string!")
+  else parseAll(factor, str) match {
     case Success(result, _) => Right(result)
     case failure: NoSuccess => Left(failure) //failure.toString = "["+failure.next.pos+"] error: "+failure.msg+"\n\n"+failure.next.pos.longString
   }
@@ -275,13 +279,23 @@ trait BaseParser extends JavaTokenParsers {
 
 //  private def waitForString {
 //    def waitEOF(): Unit = Console.readLine() match {
-//      case "" =>
 //      case "exit" =>
 //      case str: String => {
 //        val things = List(Thing("a"),Thing("b"), Thing("c"))
-//        println(PropositionParser(things).parseStr(str))
+//        println("evaluating string: '"+ str+"'")
+//        try {
+//          val r = PropositionParser(things).parseStr(str)
+//          println(r)
+//        } catch {
+//          case t:Throwable => t.printStackTrace
+//        }
 //        println("*******************")
-//        println(ActionParser(things).parseStr(str))
+//        try {
+//          val r = ActionParser(things).parseStr(str)
+//          println(r)
+//        } catch {
+//          case t:Throwable => t.printStackTrace
+//        }
 
 //        //          println(PropositionParser.parseAll(PropositionParser.stateEv, str))
 //        waitEOF()
