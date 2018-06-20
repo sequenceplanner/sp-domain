@@ -23,6 +23,7 @@ trait PropositionConditionLogics {
     prop match {
       case AND(props: List[Proposition]) => props.map(prettyPrint(ids)).mkString(" && ")
       case OR(props: List[Proposition]) => props.map(prettyPrint(ids)).mkString(" || ")
+      case NOT(prop: Proposition) => "!" + prettyPrint(ids)(prop)
       case EQ(left: StateEvaluator, right: StateEvaluator) => stateVal(left,ids) + " == " + stateVal(right,ids)
       case NEQ(left: StateEvaluator, right: StateEvaluator) => stateVal(left,ids) + " != " + stateVal(right,ids)
       case GREQ(left: StateEvaluator, right: StateEvaluator) => stateVal(left,ids) + " >= " + stateVal(right,ids)
