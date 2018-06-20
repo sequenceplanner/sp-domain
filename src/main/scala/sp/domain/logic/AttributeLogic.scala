@@ -50,6 +50,7 @@ trait AttributeLogics {
     def getAs[T](key: String = "")(implicit fjs: JSReads[T]): Option[T] = {
       value match {
         case x: SPAttributes => x.getAs[T](key)
+        case x if key.isEmpty => value.to[T].toOption
         case x => None
       }
     }
